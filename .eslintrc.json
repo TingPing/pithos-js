@@ -1,0 +1,35 @@
+{
+  "root": true,
+  "extends": "eslint:recommended",
+  "parserOptions": {
+    "ecmaVersion": 2017,
+    "ecmaFeatures": {
+      "impliedStrict": true
+    }
+  },
+  "env": {
+    "es6": true
+  },
+  "globals": {
+    "pkg": true,
+    "print": true,
+    "imports": true,
+    "ARGV": true
+  },
+  "rules": {
+    "semi": ["error", "always"],
+    "quotes": ["warn", "single"],
+    "comma-dangle": ["error", "always-multiline"],
+    "object-shorthand": ["error", "methods"],
+    "no-shadow": "warn",
+    "no-implicit-coercion": "error",
+    "no-extra-bind": "error",
+    "eqeqeq": "error",
+    "no-multi-spaces": "error",
+    "no-return-await": "error",
+    "no-use-before-define": "error",
+    "prefer-rest-params": "error",
+    "arrow-spacing": "error",
+    "semi-style": "error"
+  }
+}

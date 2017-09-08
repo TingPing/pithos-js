@@ -1,0 +1,7 @@
+data/io.github.Pithos.desktop.in
+data/io.github.Pithos.appdata.xml.in
+data/io.github.Pithos.gschema.xml
+src/main.js
+src/window.js
+src/window.ui
+

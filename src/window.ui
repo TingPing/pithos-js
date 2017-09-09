@@ -53,7 +53,7 @@
       <object class="GtkScrolledWindow">
         <property name="visible">1</property>
         <child>
-          <object class="GtkListBox">
+          <object class="GtkListBox" id="songListBox">
             <property name="visible">1</property>
           </object>
         </child>

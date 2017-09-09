@@ -17,6 +17,7 @@
  */
 
 const GObject = imports.gi.GObject;
+const Gio = imports.gi.Gio;
 const Gtk = imports.gi.Gtk;
 
 const Client = imports.client;
@@ -25,11 +26,17 @@ const Client = imports.client;
 var Window = GObject.registerClass({
     GTypeName: 'PithosWindow',
     Template: 'resource:///io/github/Pithos/window.ui',
+    InternalChildren: ['songListBox'],
 }, class Window extends Gtk.ApplicationWindow {
     _init(application) {
         super._init({application});
+        this.songList = Gio.ListStore.new(Client.Song);
+        this._songListBox.bind_model(this.songList, song => this._createSongRow(song));
         this.client = new Client.Client();
-        this.client.connect('notify::connected', this._onConnected.bind(this));
+        this.client.connect('notify::connected', () => {
+            this._onConnected().catch(error => log.warning(error));
+        });
+
         this._init_async();
     }
 
@@ -37,7 +44,7 @@ var Window = GObject.registerClass({
         try {
             await this.client.login();
         } catch (error) {
-            print(error);
+            log.warning(error);
         }
     }
 
@@ -57,12 +64,22 @@ var Window = GObject.registerClass({
                     return;
 
                 response = await station.getPlaylist();
-                print(JSON.stringify(response));
-
+                for (let item of response['items']) {
+                    let song = new Client.Song(item);
+                    this.songList.append(song);
+                }
             } catch (error) {
-                print(error);
+                log.warning(error);
             }
         }
+    }
+
+    _createSongRow(song) {
+        let box = new Gtk.Box();
+        let label = new Gtk.Label({label: song.song_name});
+        box.add(label);
+        box.show_all();
+        return box;
     }
 });
 

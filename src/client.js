@@ -1,5 +1,5 @@
+const GLib = imports.gi.GLib;
 const GObject = imports.gi.GObject;
-const Gio = imports.gi.Gio;
 const Soup = imports.gi.Soup;
 const Pithos = imports.gi.Pithos;
 
@@ -14,7 +14,7 @@ async function sendMessage(uri, body) {
                 throw new Error(`Network error: ${response_message.status_code}`);
             let response = JSON.parse(response_message.response_body_data.get_data());
             if (response['stat'] !== 'ok')
-                throw new Error('Pandora error: ' + response['message']);
+                throw new Error(`Pandora error: (${response['code']}) ${response['message']}`);
             resolve(response['result']);
         });
     });
@@ -36,20 +36,22 @@ function filterParams(params, properties) {
 
 
 /* exported Song */
+const SongProperties = {
+    songName: GObject.ParamSpec.string('song_name', '', '',
+                    GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY, ''),
+};
 var Song = GObject.registerClass({
-    Properties: {
-        songName: GObject.ParamSpec.string('song-name', '', '',
-                        GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY, ''),
-    },
+    Properties: SongProperties,
 }, class Song extends GObject.Object {
     _init(params) {
-        super._init(params);
+        super._init(filterParams(params, SongProperties));
     }
 });
 
 
 /* exported Station */
 const StationProperties = {
+    // FIXME: spec name stationToken errors
     stationToken: GObject.ParamSpec.string('station-token', '', '',
                     GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY, ''),
     client: GObject.ParamSpec.object('client', '', '',
@@ -65,7 +67,7 @@ var Station = GObject.registerClass({
 
     async getPlaylist() {
         return this.client.api_call('station.getPlaylist', {
-            stationToken: this._stationToken,
+            stationToken: this.station_token,
             additionalAudioUrl: 'HTTP_128_MP3',
         }, true);
     }
@@ -116,11 +118,11 @@ var Client = GObject.registerClass({
         if (this._userId)
             args['user_id'] = this._userId;
         if (this._userAuthToken) {
-            args['auth_token'] = this._userAuthToken;
+            args['auth_token'] = GLib.uri_escape_string(this._userAuthToken, null, false);
             body['userAuthToken'] = this._userAuthToken;
         }
         else if (this._partnerAuthToken) {
-            args['auth_token'] = this._partnerAuthToken;
+            args['auth_token'] = GLib.uri_escape_string(this._partnerAuthToken, null, false);
             body['partnerAuthToken'] = this._partnerAuthToken;
         }
         if (this._timeOffset)
@@ -129,6 +131,8 @@ var Client = GObject.registerClass({
         const uriArgs = Object.keys(args).map(key => `${key}=${args[key]}`).join('&');
         const uri = `http${https ? 's' : ''}://tuner.pandora.com/services/json/?${uriArgs}`;
         body = JSON.stringify(body);
+        log.debug(uri);
+        log.debug(body);
         if (encrypted)
             body = Pithos.encrypt_string(body);
         return sendMessage(uri, body);

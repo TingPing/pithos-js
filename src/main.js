@@ -25,10 +25,40 @@ pkg.require({
     'Pithos': '1.0',
 });
 
+const GLib = imports.gi.GLib;
 const Gio = imports.gi.Gio;
 const Gtk = imports.gi.Gtk;
 
 const Window = imports.window.Window;
+
+
+const LOG_DOMAIN = 'Pithos';
+
+function _makeLogFunction(level) {
+    return message => {
+        let stack = (new Error()).stack;
+        let caller = stack.split('\n')[1];
+
+        let [, func, file, line] = new RegExp('(.+)?@(.+):(\\d+)').exec(caller);
+        GLib.log_variant(LOG_DOMAIN, level, new GLib.Variant('a{sv}', {
+            'MESSAGE': new GLib.Variant('s', message),
+            'SYSLOG_IDENTIFIER': new GLib.Variant('s', 'io.github.Pithos'),
+            'CODE_FILE': new GLib.Variant('s', file),
+            'CODE_FUNC': new GLib.Variant('s', func),
+            'CODE_LINE': new GLib.Variant('s', line),
+        }));
+    };
+}
+
+
+window.log = {
+    message: _makeLogFunction(GLib.LogLevelFlags.LEVEL_MESSAGE),
+    debug: _makeLogFunction(GLib.LogLevelFlags.LEVEL_DEBUG),
+    info: _makeLogFunction(GLib.LogLevelFlags.LEVEL_INFO),
+    warning: _makeLogFunction(GLib.LogLevelFlags.LEVEL_WARNING),
+    critical: _makeLogFunction(GLib.LogLevelFlags.LEVEL_CRITICAL),
+};
+
 
 /* exported main */
 function main(argv) {

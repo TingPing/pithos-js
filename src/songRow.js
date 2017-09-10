@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
+const GLib = imports.gi.GLib;
 const GObject = imports.gi.GObject;
 const Gtk = imports.gi.Gtk;
 const Song = imports.client.Song;
@@ -35,8 +35,12 @@ var SongRow = GObject.registerClass({
 }, class SongRow extends Gtk.Box {
     _init(song) {
         super._init({song});
-        this.song.bind_property('song_name', this._nameLabel, 'label',
-                                GObject.BindingFlags.SYNC_CREATE);
+        this.song.connect('notify::song-name', this._updateSongName.bind(this));
+        this._updateSongName();
+    }
+
+    _updateSongName() {
+        this._nameLabel.label = `<b>${GLib.markup_escape_text(this.song.song_name, -1)}</b>`;
     }
 });
 

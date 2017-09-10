@@ -55,6 +55,7 @@
         <child>
           <object class="GtkListBox" id="songListBox">
             <property name="visible">1</property>
+            <property name="selection-mode">none</property>
           </object>
         </child>
       </object>

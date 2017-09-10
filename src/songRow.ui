@@ -2,9 +2,21 @@
 <interface>
   <requires lib="gtk+" version="3.22"/>
   <template class="PithosSongRow" parent="GtkBox">
+    <property name="height-request">96</property>
+    <child>
+      <object class="GtkImage">
+        <property name="visible">1</property>
+        <property name="icon-name">io.github.Pithos-symbolic</property>
+        <property name="icon-size">6</property>
+        <property name="height-request">96</property>
+        <property name="width-request">96</property>
+      </object>
+    </child>
     <child>
       <object class="GtkLabel" id="nameLabel">
         <property name="visible">1</property>
+        <property name="use-markup">1</property>
+        <property name="valign">start</property>
       </object>
     </child>
   </template>

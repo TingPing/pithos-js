@@ -66,6 +66,8 @@ var Window = GObject.registerClass({
 
                 response = await station.getPlaylist();
                 for (let item of response['items']) {
+                    if (item.adToken)
+                        continue;
                     let song = new Client.Song(item);
                     this.songList.append(song);
                 }

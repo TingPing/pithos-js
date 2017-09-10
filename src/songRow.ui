@@ -4,7 +4,7 @@
   <template class="PithosSongRow" parent="GtkBox">
     <property name="height-request">96</property>
     <child>
-      <object class="GtkImage">
+      <object class="GtkImage" id="albumImage">
         <property name="visible">1</property>
         <property name="icon-name">io.github.Pithos-symbolic</property>
         <property name="icon-size">6</property>

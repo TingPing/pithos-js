@@ -12,3 +12,7 @@ progressbar progress {
 progressbar progress:backdrop {
   box-shadow: none;
 }
+
+pithossongrow label {
+	padding: 6px;
+}

@@ -19,14 +19,30 @@
 const GLib = imports.gi.GLib;
 const GObject = imports.gi.GObject;
 const Gtk = imports.gi.Gtk;
+const GdkPixbuf = imports.gi.GdkPixbuf;
+const Soup = imports.gi.Soup;
 const Song = imports.client.Song;
+
+
+const _session = new Soup.Session();
+async function _downloadUrl(uri) {
+    return new Promise((resolve) => {
+        let message = Soup.Message.new('GET', uri);
+        log.info(`Downloading ${uri}`);
+        _session.queue_message(message, (session, response_message) => {
+            if (response_message.status_code !== 200)
+                throw new Error(`Network error: ${response_message.status_code}`);
+            resolve(response_message.response_body_data);
+        });
+    });
+}
 
 /* exported SongRow */
 var SongRow = GObject.registerClass({
     GTypeName: 'PithosSongRow',
-    CSSName: 'pithossongrow',
+    CssName: 'pithossongrow',
     Template: 'resource:///io/github/Pithos/songRow.ui',
-    InternalChildren: ['nameLabel'],
+    InternalChildren: ['nameLabel', 'albumImage'],
     Properties: {
         song: GObject.ParamSpec.object('song', '', '',
                 GObject.ParamFlags.CONSTRUCT_ONLY | GObject.ParamFlags.READWRITE,
@@ -37,10 +53,29 @@ var SongRow = GObject.registerClass({
         super._init({song});
         this.song.connect('notify::song-name', this._updateSongName.bind(this));
         this._updateSongName();
+        this._init_async();
+    }
+
+    async _init_async() {
+        try {
+            let data = await _downloadUrl(this.song.album_art_url);
+            let loader = GdkPixbuf.PixbufLoader.new_with_mime_type('image/jpeg');
+            loader.set_size(96, 96);
+            loader.write_bytes(data);
+            if (loader.close()) {
+                this._albumImage.pixbuf = loader.get_pixbuf();
+            }
+        }
+        catch (error) {
+            log.warning(error);
+        }
     }
 
     _updateSongName() {
-        this._nameLabel.label = `<b>${GLib.markup_escape_text(this.song.song_name, -1)}</b>`;
+        let songName = GLib.markup_escape_text(this.song.song_name, -1);
+        let artistName = GLib.markup_escape_text(this.song.artist_name, -1);
+        let albumName = GLib.markup_escape_text(this.song.album_name, -1);
+        this._nameLabel.label = `<b>${songName}</b>\nby <b>${artistName}</b>\nfrom <b>${albumName}</b>`;
     }
 });
 

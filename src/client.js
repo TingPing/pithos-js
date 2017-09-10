@@ -37,7 +37,13 @@ function filterParams(params, properties) {
 
 /* exported Song */
 const SongProperties = {
-    songName: GObject.ParamSpec.string('song_name', '', '',
+    songName: GObject.ParamSpec.string('song-name', '', '',
+                    GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY, ''),
+    artistName: GObject.ParamSpec.string('artist-name', '', '',
+                    GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY, ''),
+    albumName: GObject.ParamSpec.string('album-name', '', '',
+                    GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY, ''),
+    albumArtUrl: GObject.ParamSpec.string('album-art_url', '', '',
                     GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY, ''),
 };
 var Song = GObject.registerClass({
@@ -47,6 +53,7 @@ var Song = GObject.registerClass({
         super._init(filterParams(params, SongProperties));
     }
 });
+
 
 
 /* exported Station */

@@ -41,13 +41,20 @@ function _makeLogFunction(level) {
 
         let [, func, file, line] = new RegExp('(.+)?@(.+):(\\d+)').exec(caller);
         GLib.log_variant(LOG_DOMAIN, level, new GLib.Variant('a{sv}', {
-            'MESSAGE': new GLib.Variant('s', message),
+            'MESSAGE': new GLib.Variant('s', `${message}`),
             'SYSLOG_IDENTIFIER': new GLib.Variant('s', 'io.github.Pithos'),
             'CODE_FILE': new GLib.Variant('s', file),
             'CODE_FUNC': new GLib.Variant('s', func),
             'CODE_LINE': new GLib.Variant('s', line),
         }));
     };
+}
+
+function _loadCSS(win) {
+    let provider = new Gtk.CssProvider();
+    provider.load_from_resource('/io/github/Pithos/main.css');
+    Gtk.StyleContext.add_provider_for_screen(win.get_screen(), provider,
+        Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
 }
 
 
@@ -69,8 +76,10 @@ function main(argv) {
 
     app.connect('activate', app => {
         let win = app.active_window;
-        if (!win)
+        if (!win) {
             win = new Window(app);
+            _loadCSS(win);
+        }
         win.present();
     });
 

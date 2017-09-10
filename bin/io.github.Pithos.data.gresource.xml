@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <gresources>
   <gresource prefix="/io/github/Pithos">
+    <file>main.css</file>
+    <file>songRow.ui</file>
     <file>window.ui</file>
   </gresource>
 </gresources>

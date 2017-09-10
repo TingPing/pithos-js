@@ -1,0 +1,14 @@
+progressbar trough {
+  background-color: @theme_bg_color;
+  border-width: 0;
+}
+
+progressbar progress {
+  background-color: @theme_selected_bg_color;
+  border-width: 0;
+  box-shadow: 0 0 3px @theme_selected_bg_color;
+}
+
+progressbar progress:backdrop {
+  box-shadow: none;
+}

@@ -21,6 +21,7 @@ const Gio = imports.gi.Gio;
 const Gtk = imports.gi.Gtk;
 
 const Client = imports.client;
+const SongRow = imports.songRow.SongRow;
 
 /* exported Window */
 var Window = GObject.registerClass({
@@ -31,7 +32,7 @@ var Window = GObject.registerClass({
     _init(application) {
         super._init({application});
         this.songList = Gio.ListStore.new(Client.Song);
-        this._songListBox.bind_model(this.songList, song => this._createSongRow(song));
+        this._songListBox.bind_model(this.songList, song => new SongRow(song));
         this.client = new Client.Client();
         this.client.connect('notify::connected', () => {
             this._onConnected().catch(error => log.warning(error));
@@ -72,14 +73,6 @@ var Window = GObject.registerClass({
                 log.warning(error);
             }
         }
-    }
-
-    _createSongRow(song) {
-        let box = new Gtk.Box();
-        let label = new Gtk.Label({label: song.song_name});
-        box.add(label);
-        box.show_all();
-        return box;
     }
 });
 

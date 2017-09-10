@@ -3,6 +3,7 @@
   <gresource prefix="/io/github/Pithos/js">
     <file>client.js</file>
     <file>main.js</file>
+    <file>songRow.js</file>
     <file>window.js</file>
   </gresource>
 </gresources>
